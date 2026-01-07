@@ -10,7 +10,7 @@ namespace MercadoFacil.Api.Data
             var optionsBuilder = new DbContextOptionsBuilder<MercadoFacilContext>();
 
             var connectionString =
-                "Server=localhost;Database=marcadofacil;User=adm;Password=ab12c3;";
+                "Server=localhost;Database=mercadofacil;User=root;Password=ab12c3;";
 
             optionsBuilder.UseMySql(
                 connectionString,
