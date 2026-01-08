@@ -1,28 +1,27 @@
 .home-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
   background: linear-gradient(135deg, #2d8659 0%, #4caf50 30%, #ff9800 70%, #ff6f00 100%);
   padding: 20px;
-  overflow: auto;
+  box-sizing: border-box;
 }
 
 .home-card {
   background: white;
   border-radius: 16px;
   padding: 0;
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   min-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .home-header {
-  padding: 20px 30px;
+  padding: 30px;
   border-bottom: 2px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
@@ -32,7 +31,7 @@
 }
 
 .home-logo {
-  max-width: 180px;
+  max-width: 280px;
   height: auto;
 }
 
@@ -46,12 +45,19 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .logout-button:hover {
   background-color: #e65100;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 111, 0, 0.3);
+}
+
+.logout-icon {
+  font-size: 16px;
 }
 
 .home-content {
@@ -72,7 +78,7 @@
 
 /* Botão flutuante (FAB) */
 .fab-button {
-  position: fixed;
+  position: absolute;
   bottom: 30px;
   right: 30px;
   width: 64px;
@@ -81,7 +87,7 @@
   background-color: #2d8659;
   color: white;
   font-size: 32px;
-  font-weight: 300;
+  font-weight: bold;
   border: none;
   box-shadow: 0 6px 20px rgba(45, 134, 89, 0.4);
   cursor: pointer;
@@ -89,7 +95,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 100;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.fab-plus {
+  font-weight: bold;
+  line-height: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 
 .fab-button:hover {
@@ -110,18 +126,18 @@
   width: 100vw;
   height: 100vh;
   background: transparent;
-  z-index: 999;
+  z-index: 99;
 }
 
 .fab-menu {
-  position: fixed;
+  position: absolute;
   bottom: 110px;
   right: 30px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  z-index: 1001;
+  z-index: 101;
   animation: slideUp 0.2s ease-out;
 }
 
@@ -172,17 +188,17 @@
 
   .home-card {
     min-height: calc(100vh - 20px);
+    max-width: 100%;
   }
 
   .home-header {
-    padding: 15px 20px;
+    padding: 20px;
     flex-direction: column;
     gap: 15px;
-    align-items: center;
   }
 
   .home-logo {
-    max-width: 150px;
+    max-width: 220px;
   }
 
   .home-content {

@@ -66,6 +66,7 @@ namespace MercadoFacil.Api.Controllers
                 claims = new List<Claim>()
                 {
                     new Claim("userId", user.UsuarioId.ToString()),
+                    new Claim("userName", user.Username),
                 };
             }
 

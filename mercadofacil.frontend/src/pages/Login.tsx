@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/authService';
 import '../styles/Login.css';
 import logo from '../assets/images/Logo.png';
 
@@ -7,38 +8,27 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
     try {
-      // Aqui você faria a chamada real para sua API
-      // const response = await fetch('http://sua-api.com/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ username, password })
-      // });
-      // const data = await response.json();
-      // if (data.token) {
-      //   login(data.token);
-      // }
+      const response = await authService.login({
+        Username: username,
+        Password: password,
+      });
       
-      // Simulação temporária - remova quando conectar com a API real
-      // Criando um token JWT fake para teste
-      const fakeToken = btoa(JSON.stringify({ 
-        header: { alg: 'HS256', typ: 'JWT' }
-      })) + '.' + btoa(JSON.stringify({ 
-        username: username,
-        sub: username,
-        exp: Date.now() + 3600000 
-      })) + '.' + btoa('signature');
-      
-      login(fakeToken);
+      login(response.token);
     } catch (err) {
-      setError('Erro ao fazer login. Tente novamente.');
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer login. Tente novamente.';
+      setError(errorMessage);
       console.error('Erro no login:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,8 +77,8 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <button type="submit" className="btn-login">
-            🔓 Entrar
+          <button type="submit" className="btn-login" disabled={loading}>
+            {loading ? '⏳ Entrando...' : '🔓 Entrar'}
           </button>
 
           <button type="button" className="btn-install" onClick={handleInstallApp}>

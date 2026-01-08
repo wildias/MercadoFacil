@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Decodificar o token JWT (básico, sem validação de assinatura)
       try {
         const payload = JSON.parse(atob(storedToken.split('.')[1]));
-        setUser({ username: payload.username || payload.sub, token: storedToken });
+        setUser({ username: payload.userName || payload.username || payload.sub, token: storedToken });
       } catch (error) {
         console.error('Erro ao decodificar token:', error);
         localStorage.removeItem('token');
@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // Decodificar o token JWT para extrair informações do usuário
       const payload = JSON.parse(atob(token.split('.')[1]));
-      const username = payload.username || payload.sub;
+      const username = payload.userName || payload.username || payload.sub;
       
       setUser({ username, token });
       localStorage.setItem('token', token);
