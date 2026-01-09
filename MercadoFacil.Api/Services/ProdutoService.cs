@@ -1,6 +1,7 @@
 ﻿using MercadoFacil.Api.Data;
 using MercadoFacil.Api.Model;
 using MercadoFacil.Api.Model.Enum;
+using MercadoFacil.Api.Model.Response;
 using MercadoFacil.Api.Model.ViewModel;
 using MercadoFacil.Api.Util;
 using static System.Net.Mime.MediaTypeNames;
@@ -30,7 +31,7 @@ namespace MercadoFacil.Api.Services
                         Descricao = item.Descricao,
                         Tipo = Enum.Parse<UnidadeEnum>(item.Tipo),
                         Secao = Enum.Parse<SecaoEnum>(item.Secao),
-                        Imagem = ImagemUtil.ComprimirImagemBase64ParaBytes(item.Imagem)
+                        Imagem = item.Imagem != null ? ImagemUtil.ComprimirImagemBase64ParaBytes(item.Imagem) : null
                     };
 
                     await _context.Produto.AddAsync(novoProduto);
@@ -43,6 +44,30 @@ namespace MercadoFacil.Api.Services
             {
 
                 return false;
+            }
+        }
+
+        internal async Task<ICollection<ProdutoResponse>> BuscarProdutos()
+        {
+            try
+            {
+                var prods = _context.Produto
+                    .Select(p => new ProdutoResponse
+                    {
+                        ProdutoId = p.ProdutoId,
+                        Descricao = p.Descricao,
+                        Imagem = p.Imagem == null ? null : ImagemUtil.DescomprimirImagemParaBase64(p.Imagem),
+                        Tipo = p.Tipo.ToString(),
+                        Secao = p.Secao.ToString(),
+                    })
+                    .ToList();
+
+                return prods;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
             }
         }
     }

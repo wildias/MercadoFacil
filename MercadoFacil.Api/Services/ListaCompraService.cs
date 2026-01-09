@@ -53,5 +53,23 @@ namespace MercadoFacil.Api.Services
                 return false;
             }
         }
+
+        internal async Task<bool> DeletarListaCompra(int idLista, ListaCompraViewModel request)
+        {
+            try
+            {
+                var lista = await _context.ListaCompra.FirstOrDefaultAsync(l => l.ListaCompraId == idLista);
+                if (lista == null) return false;
+
+                _context.ListaCompra.Remove(lista);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
     }
 }
