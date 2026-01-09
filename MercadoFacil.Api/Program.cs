@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 builder.WebHost.UseUrls($"http://*:{port}");
 
+
 var connectionString = builder.Configuration.GetConnectionString("MercadoFacilDB");
 
 builder.Services.AddDbContext<MercadoFacilContext>(options =>
