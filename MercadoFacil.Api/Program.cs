@@ -7,23 +7,24 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 var connectionString = builder.Configuration.GetConnectionString("MercadoFacilDB");
 
 builder.Services.AddDbContext<MercadoFacilContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHttpContextAccessor();
 
-// App services
 builder.Services.AddScoped<ListaCompraService>();
 builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<UsuarioService>();
 
-// Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -40,25 +41,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// CORS
-const string CorsDevPolicy = "AllowDevOrigins";
+const string CorsPolicy = "AllowFrontend";
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(CorsDevPolicy, policy =>
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-    // .AllowCredentials() // habilite apenas se usar cookies; NÃO combine com AllowAnyOrigin
+    options.AddPolicy(CorsPolicy, policy =>
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(_ => true)
     );
 });
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    options.JsonSerializerOptions.ReferenceHandler =
+        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.DefaultIgnoreCondition =
+        System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
-
-builder.WebHost.ConfigureKestrel(options => { options.ListenAnyIP(5000); });
 
 var app = builder.Build();
 
@@ -68,21 +69,14 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-// app.UseHttpsRedirection();
-
-// ORDEM IMPORTA: CORS antes de Auth/Authorization e antes do MapControllers
-app.UseCors(CorsDevPolicy);
+app.UseCors(CorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// (Opcional) se tiver endpoints fora de controllers e quiser garantir resposta ao preflight:
 app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
 
 app.MapControllers();
