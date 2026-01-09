@@ -79,12 +79,16 @@
 /* Lista de compras */
 .listas-container {
   margin-top: 40px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .listas-container h3 {
   color: #ff9800;
   font-size: 20px;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .loading-listas {
@@ -114,9 +118,10 @@
 }
 
 .listas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 15px;
+  justify-content: center;
 }
 
 .lista-card {
@@ -126,6 +131,13 @@
   border: 2px solid #e0e0e0;
   transition: all 0.3s;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  min-width: 250px;
+  max-width: 350px;
+  flex: 1 1 250px;
 }
 
 .lista-card:hover {
@@ -135,10 +147,31 @@
   box-shadow: 0 4px 12px rgba(45, 134, 89, 0.15);
 }
 
+.lista-icone {
+  max-width: 40px;
+  height: auto;
+  flex-shrink: 0;
+}
+
 .lista-titulo {
   font-weight: 600;
   color: #333;
   font-size: 16px;
+  flex: 1;
+}
+
+.btn-deletar-lista {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-deletar-lista:hover {
+  transform: scale(1.2);
 }
 
 /* Botão flutuante (FAB) */

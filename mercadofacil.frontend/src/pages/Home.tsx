@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import CadastrarProduto from './CadastrarProduto';
 import CriarLista from './CriarLista';
+import DetalheListaCompra from './DetalheListaCompra';
+import Modal, { type ModalType } from '../components/Modal';
 import '../styles/Home.css';
 import logo from '../assets/images/Logo.png';
+import icone from '../assets/images/Icone.png';
 import { listaCompraService, type ListaCompraResponse } from '../services/listaCompraService';
 
 const Home: React.FC = () => {
@@ -13,6 +16,11 @@ const Home: React.FC = () => {
   const [showCriarLista, setShowCriarLista] = useState(false);
   const [listas, setListas] = useState<ListaCompraResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listaSelecionada, setListaSelecionada] = useState<ListaCompraResponse | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>('pergunta');
+  const [modalMessage, setModalMessage] = useState('');
+  const [listaParaDeletar, setListaParaDeletar] = useState<ListaCompraResponse | null>(null);
 
   useEffect(() => {
     buscarListas();
@@ -27,6 +35,37 @@ const Home: React.FC = () => {
       console.error('Erro ao buscar listas:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAbrirLista = (lista: ListaCompraResponse) => {
+    setListaSelecionada(lista);
+  };
+
+  const handleSolicitarExclusao = (e: React.MouseEvent, lista: ListaCompraResponse) => {
+    e.stopPropagation();
+    setListaParaDeletar(lista);
+    setModalType('pergunta');
+    setModalMessage(`Deseja realmente excluir a Lista de Compra ${lista.listaCompraId}?`);
+    setModalOpen(true);
+  };
+
+  const handleConfirmarExclusao = async () => {
+    if (!listaParaDeletar) return;
+
+    try {
+      await listaCompraService.deletarLista(listaParaDeletar.listaCompraId, listaParaDeletar.lista);
+      setModalType('sucesso');
+      setModalMessage('Lista excluída com sucesso!');
+      setModalOpen(true);
+      await buscarListas();
+      setListaParaDeletar(null);
+    } catch (error) {
+      console.error('Erro ao deletar lista:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao deletar lista.';
+      setModalType('erro');
+      setModalMessage(errorMessage);
+      setModalOpen(true);
     }
   };
 
@@ -86,10 +125,22 @@ const Home: React.FC = () => {
             ) : (
               <div className="listas-grid">
                 {listas.map((lista) => (
-                  <div key={lista.listaCompraId} className="lista-card">
+                  <div 
+                    key={lista.listaCompraId} 
+                    className="lista-card"
+                    onClick={() => handleAbrirLista(lista)}
+                  >
+                    <img src={icone} alt="Ícone" className="lista-icone" />
                     <span className="lista-titulo">
                       Lista de Compra: {lista.listaCompraId}
                     </span>
+                    <button
+                      className="btn-deletar-lista"
+                      onClick={(e) => handleSolicitarExclusao(e, lista)}
+                      title="Excluir lista"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 ))}
               </div>
@@ -123,6 +174,25 @@ const Home: React.FC = () => {
           </>
         )}
       </div>
+
+      {listaSelecionada && (
+        <DetalheListaCompra
+          listaCompraId={listaSelecionada.listaCompraId}
+          listaJson={listaSelecionada.lista}
+          onClose={() => setListaSelecionada(null)}
+        />
+      )}
+
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        message={modalMessage}
+        onClose={() => {
+          setModalOpen(false);
+          setListaParaDeletar(null);
+        }}
+        onConfirm={modalType === 'pergunta' ? handleConfirmarExclusao : undefined}
+      />
     </div>
   );
 };
