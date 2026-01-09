@@ -10,10 +10,20 @@ var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 builder.WebHost.UseUrls($"http://*:{port}");
 
-var connectionString = builder.Configuration.GetConnectionString("MercadoFacilDB");
+var host = Environment.GetEnvironmentVariable("MYSQLHOST");
+var portDb = Environment.GetEnvironmentVariable("MYSQLPORT");
+var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
+var user = Environment.GetEnvironmentVariable("MYSQLUSER");
+var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
+
+var connectionString =
+    $"Server={host};Port={portDb};Database={database};User={user};Password={password};SslMode=Preferred;";
 
 builder.Services.AddDbContext<MercadoFacilContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql(
+        connectionString,
+        new MySqlServerVersion(new Version(8, 0, 36))
+    ));
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -65,8 +75,15 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<MercadoFacilContext>();
-    dbContext.Database.Migrate();
+    try
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<MercadoFacilContext>();
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
 }
 
 app.UseSwagger();
