@@ -17,8 +17,13 @@ var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
 var user = Environment.GetEnvironmentVariable("MYSQLUSER");
 var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
 
+Console.WriteLine($"MYSQLHOST={host}");
+Console.WriteLine($"MYSQLPORT={portDb}");
+Console.WriteLine($"MYSQLDATABASE={database}");
+Console.WriteLine($"MYSQLUSER={user}");
+
 var connectionString =
-    $"Server={host};Port={portDb};Database={database};User={user};Password={password};SslMode=Preferred;";
+    $"Server={host};Port={portDb};Database={database};User={user};Password={password};SslMode=Required;";
 
 builder.Services.AddDbContext<MercadoFacilContext>(options =>
     options.UseMySql(
@@ -81,18 +86,26 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+var retry = 0;
+while (retry < 5)
 {
     try
     {
-        var dbContext = scope.ServiceProvider.GetRequiredService<MercadoFacilContext>();
-        dbContext.Database.Migrate();
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<MercadoFacilContext>();
+        db.Database.Migrate();
+        Console.WriteLine("Migration aplicada com sucesso!");
+        break;
     }
     catch (Exception ex)
     {
+        retry++;
+        Console.WriteLine($"Tentativa {retry} falhou:");
         Console.WriteLine(ex.Message);
+        Thread.Sleep(5000);
     }
 }
+
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
