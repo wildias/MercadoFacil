@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/CriarLista.css';
 import logo from '../assets/images/Logo.png';
-
-interface Produto {
-  produtoId: number;
-  descricao: string;
-  imagem: string;
-  secao: string;
-  tipo: string;
-}
+import Modal, { type ModalType } from '../components/Modal';
+import { produtoService, type Produto } from '../services/produtoService';
+import { formatImageBase64 } from '../utils/imageHelper';
+import { listaCompraService } from '../services/listaCompraService';
 
 interface ProdutoSelecionado extends Produto {
   quantidade: number;
@@ -24,6 +20,9 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingProdutos, setLoadingProdutos] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>('sucesso');
+  const [modalMessage, setModalMessage] = useState('');
 
   const secoes = [
     { value: 'Acougue', label: 'Açougue' },
@@ -50,21 +49,13 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
   const buscarProdutos = async () => {
     setLoadingProdutos(true);
     try {
-      const response = await fetch('http://localhost:5000/api/Produto', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar produtos');
-      }
-
-      const data = await response.json();
+      const data = await produtoService.buscarProdutos();
       setProdutos(data);
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
-      alert('Erro ao carregar produtos. Tente novamente.');
+      setModalType('erro');
+      setModalMessage('Erro ao carregar produtos. Tente novamente.');
+      setModalOpen(true);
     } finally {
       setLoadingProdutos(false);
     }
@@ -105,7 +96,9 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
 
   const handleCriarLista = async () => {
     if (produtosSelecionados.length === 0) {
-      alert('Adicione pelo menos um produto à lista');
+      setModalType('atencao');
+      setModalMessage('Adicione pelo menos um produto à lista');
+      setModalOpen(true);
       return;
     }
 
@@ -113,24 +106,17 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/ListaCompra', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ Lista: listaJson }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao criar lista');
-      }
-
-      alert('Lista criada com sucesso!');
-      onClose();
+      const mensagem = await listaCompraService.cadastrarLista(listaJson);
+      setModalType('sucesso');
+      setModalMessage(mensagem || 'Lista criada com sucesso!');
+      setModalOpen(true);
+      setTimeout(() => onClose(), 2000);
     } catch (error) {
       console.error('Erro ao criar lista:', error);
-      alert('Erro ao criar lista. Tente novamente.');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao criar lista. Tente novamente.';
+      setModalType('erro');
+      setModalMessage(errorMessage);
+      setModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -157,7 +143,7 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
                 {produtosSelecionados.map((produto) => (
                   <div key={produto.produtoId} className="produto-selecionado">
                     {produto.imagem && (
-                      <img src={produto.imagem} alt={produto.descricao} className="produto-img" />
+                      <img src={formatImageBase64(produto.imagem)} alt={produto.descricao} className="produto-img" />
                     )}
                     <div className="produto-info">
                       <span className="produto-nome">{produto.descricao}</span>
@@ -238,7 +224,7 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
                   {produtos.map((produto) => (
                     <div key={produto.produtoId} className="produto-card">
                       {produto.imagem && (
-                        <img src={produto.imagem} alt={produto.descricao} className="produto-card-img" />
+                        <img src={formatImageBase64(produto.imagem)} alt={produto.descricao} className="produto-card-img" />
                       )}
                       <div className="produto-card-info">
                         <span className="produto-card-nome">{produto.descricao}</span>
@@ -263,6 +249,13 @@ const CriarLista: React.FC<CriarListaProps> = ({ onClose }) => {
           </div>
         </div>
       )}
+
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        message={modalMessage}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 };

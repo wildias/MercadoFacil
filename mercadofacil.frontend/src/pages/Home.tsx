@@ -1,15 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import CadastrarProduto from './CadastrarProduto';
 import CriarLista from './CriarLista';
 import '../styles/Home.css';
 import logo from '../assets/images/Logo.png';
+import { listaCompraService, type ListaCompraResponse } from '../services/listaCompraService';
 
 const Home: React.FC = () => {
   const { user, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showCadastrarProduto, setShowCadastrarProduto] = useState(false);
   const [showCriarLista, setShowCriarLista] = useState(false);
+  const [listas, setListas] = useState<ListaCompraResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    buscarListas();
+  }, []);
+
+  const buscarListas = async () => {
+    setLoading(true);
+    try {
+      const data = await listaCompraService.buscarListas();
+      setListas(data);
+    } catch (error) {
+      console.error('Erro ao buscar listas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateList = () => {
     setShowMenu(false);
@@ -35,7 +54,10 @@ const Home: React.FC = () => {
   }
 
   if (showCriarLista) {
-    return <CriarLista onClose={() => setShowCriarLista(false)} />;
+    return <CriarLista onClose={() => {
+      setShowCriarLista(false);
+      buscarListas();
+    }} />;
   }
 
   return (
@@ -51,7 +73,28 @@ const Home: React.FC = () => {
 
         <div className="home-content">
           <h2>Bem-vindo(a), {user?.username}!</h2>
-          <p>Selecione uma opção abaixo para começar.</p>
+
+          <div className="listas-container">
+            <h3>Minhas Listas de Compras</h3>
+            {loading ? (
+              <div className="loading-listas">Carregando listas...</div>
+            ) : listas.length === 0 ? (
+              <div className="empty-listas">
+                <p>📋 Nenhuma lista criada ainda</p>
+                <p className="hint">Clique no botão + para criar sua primeira lista!</p>
+              </div>
+            ) : (
+              <div className="listas-grid">
+                {listas.map((lista) => (
+                  <div key={lista.listaCompraId} className="lista-card">
+                    <span className="lista-titulo">
+                      Lista de Compra: {lista.listaCompraId}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Botão flutuante com + */}

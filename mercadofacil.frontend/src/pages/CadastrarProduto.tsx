@@ -1,13 +1,11 @@
 import React, { useState, useRef } from 'react';
 import '../styles/CadastrarProduto.css';
 import logo from '../assets/images/Logo.png';
+import { API_BASE_URL } from '../config/api';
+import Modal, { type ModalType } from '../components/Modal';
+import { produtoService, type ProdutoCadastro } from '../services/produtoService';
 
-interface Produto {
-  Descricao: string;
-  Imagem: string;
-  Secao: string;
-  Tipo: string;
-}
+interface Produto extends ProdutoCadastro {}
 
 interface CadastrarProdutoProps {
   onClose: () => void;
@@ -22,6 +20,10 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>('sucesso');
+  const [modalMessage, setModalMessage] = useState('');
+  const [produtoParaRemover, setProdutoParaRemover] = useState<number | null>(null);
 
   const secoes = [
     { value: 'Acougue', label: 'Açougue' },
@@ -54,7 +56,9 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
 
   const handleNovoProduto = () => {
     if (!descricao.trim() || !secao) {
-      alert('Por favor, preencha a descrição e selecione a seção');
+      setModalType('atencao');
+      setModalMessage('Por favor, preencha a descrição e selecione a seção');
+      setModalOpen(true);
       return;
     }
 
@@ -75,33 +79,42 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
     setTipo('UN');
   };
 
+  const handleSolicitarRemocao = (index: number) => {
+    setProdutoParaRemover(index);
+    setModalType('pergunta');
+    setModalMessage('Deseja realmente excluir este produto da lista?');
+    setModalOpen(true);
+  };
+
+  const handleConfirmarRemocao = () => {
+    if (produtoParaRemover !== null) {
+      setProdutos(produtos.filter((_, index) => index !== produtoParaRemover));
+      setProdutoParaRemover(null);
+    }
+  };
+
   const handleEnviarProdutos = async () => {
     if (produtos.length === 0) {
-      alert('Adicione pelo menos um produto antes de enviar');
+      setModalType('atencao');
+      setModalMessage('Adicione pelo menos um produto antes de enviar');
+      setModalOpen(true);
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/Produto', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(produtos),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao enviar produtos');
-      }
-
-      alert(`${produtos.length} produto(s) cadastrado(s) com sucesso!`);
+      const data = await produtoService.cadastrarProdutos(produtos);
+      setModalType('sucesso');
+      setModalMessage(data.message || `${produtos.length} produto(s) cadastrado(s) com sucesso!`);
+      setModalOpen(true);
       setProdutos([]);
-      onClose();
+      setTimeout(() => onClose(), 2000);
     } catch (error) {
       console.error('Erro ao enviar produtos:', error);
-      alert('Erro ao enviar produtos. Tente novamente.');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao enviar produtos. Tente novamente.';
+      setModalType('erro');
+      setModalMessage(errorMessage);
+      setModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -174,10 +187,16 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
                 <div className="produtos-items">
                   {produtos.map((prod, index) => (
                     <div key={index} className="produto-item">
-                      <span className="produto-descricao">{prod.Descricao}</span>
-                      <span className="produto-info">
-                        {prod.Tipo} - {secoes.find(s => s.value === prod.Secao)?.label}
+                      <span className="produto-texto">
+                        {prod.Descricao} - {prod.Tipo} - {secoes.find(s => s.value === prod.Secao)?.label}
                       </span>
+                      <button
+                        className="btn-remover-produto"
+                        onClick={() => handleSolicitarRemocao(index)}
+                        title="Remover produto"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -208,6 +227,17 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
           </div>
         </footer>
       </div>
+
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        message={modalMessage}
+        onClose={() => {
+          setModalOpen(false);
+          setProdutoParaRemover(null);
+        }}
+        onConfirm={modalType === 'pergunta' ? handleConfirmarRemocao : undefined}
+      />
     </div>
   );
 };

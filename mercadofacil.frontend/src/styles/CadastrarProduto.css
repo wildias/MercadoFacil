@@ -140,7 +140,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 200px;
+  max-height: 165px;
   overflow-y: auto;
 }
 
@@ -148,20 +148,36 @@
   background: white;
   padding: 12px;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 45px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 10px;
 }
 
-.produto-descricao {
-  font-weight: 600;
+.produto-texto {
+  font-weight: 500;
   color: #333;
+  font-size: 14px;
+  flex: 1;
 }
 
-.produto-info {
-  color: #666;
-  font-size: 14px;
+.btn-remover-produto {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-remover-produto:hover {
+  transform: scale(1.2);
 }
 
 .cadastro-footer {

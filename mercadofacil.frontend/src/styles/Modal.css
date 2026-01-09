@@ -1,0 +1,122 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  min-width: 400px;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px;
+  text-align: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.modal-header-sucesso {
+  background-color: #28a745;
+}
+
+.modal-header-atencao {
+  background-color: #ffc107;
+}
+
+.modal-header-erro {
+  background-color: #dc3545;
+}
+
+.modal-header-pergunta {
+  background-color: #007bff;
+}
+
+.modal-body {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.modal-body p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modal-btn {
+  padding: 10px 30px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-btn-fechar {
+  background-color: #6c757d;
+  color: white;
+}
+
+.modal-btn-fechar:hover {
+  background-color: #5a6268;
+}
+
+.modal-btn-sim {
+  background-color: #28a745;
+  color: white;
+}
+
+.modal-btn-sim:hover {
+  background-color: #218838;
+}
+
+.modal-btn-nao {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-btn-nao:hover {
+  background-color: #c82333;
+}
+
+.icon-check,
+.icon-x {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .modal-container {
+    min-width: 90%;
+    max-width: 90%;
+  }
+}

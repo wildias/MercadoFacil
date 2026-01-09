@@ -1,4 +1,5 @@
-﻿using MercadoFacil.Api.Model.ViewModel;
+﻿using MercadoFacil.Api.Model.Response;
+using MercadoFacil.Api.Model.ViewModel;
 using MercadoFacil.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +29,13 @@ namespace MercadoFacil.Api.Controllers
             }
 
             return BadRequest("Erro ao criar lista");
+        }
+
+        [HttpGet("buscar")]
+        public async Task<ActionResult<IEnumerable<ListaCompraResponse>>> GetProdutos()
+        {
+            var listas = await _listaCompraService.BuscarListas();
+            return Ok(listas);
         }
 
         [HttpPut("{id}/atualizar")]

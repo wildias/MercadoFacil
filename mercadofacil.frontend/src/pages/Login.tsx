@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/authService';
 import '../styles/Login.css';
 import logo from '../assets/images/Logo.png';
+import Modal, { type ModalType } from '../components/Modal';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -10,6 +11,9 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>('erro');
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +29,9 @@ const Login: React.FC = () => {
       login(response.token);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer login. Tente novamente.';
-      setError(errorMessage);
+      setModalType('erro');
+      setModalMessage(errorMessage);
+      setModalOpen(true);
       console.error('Erro no login:', err);
     } finally {
       setLoading(false);
@@ -54,7 +60,7 @@ const Login: React.FC = () => {
               <input
                 type="text"
                 id="username"
-                placeholder="Digite seu usuário"
+                placeholder="Digite seu nome"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -86,6 +92,13 @@ const Login: React.FC = () => {
           </button>
         </form>
       </div>
+
+      <Modal
+        isOpen={modalOpen}
+        type={modalType}
+        message={modalMessage}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 ﻿using MercadoFacil.Api.Data;
 using MercadoFacil.Api.Model;
+using MercadoFacil.Api.Model.Response;
 using MercadoFacil.Api.Model.ViewModel;
+using MercadoFacil.Api.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace MercadoFacil.Api.Services
@@ -31,6 +33,27 @@ namespace MercadoFacil.Api.Services
             {
 
                 return false;
+            }
+        }
+
+        internal async Task<ICollection<ListaCompraResponse>> BuscarListas()
+        {
+            try
+            {
+                var listas = _context.ListaCompra
+                    .Select(l => new ListaCompraResponse
+                    {
+                        ListaCompraId = l.ListaCompraId,
+                        Lista = l.Lista
+                    })
+                    .ToList();
+
+                return listas;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
             }
         }
 
