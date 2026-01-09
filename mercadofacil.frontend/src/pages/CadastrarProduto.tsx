@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import '../styles/CadastrarProduto.css';
 import logo from '../assets/images/Logo.png';
-import { API_BASE_URL } from '../config/api';
 import Modal, { type ModalType } from '../components/Modal';
 import { produtoService, type ProdutoCadastro } from '../services/produtoService';
 
