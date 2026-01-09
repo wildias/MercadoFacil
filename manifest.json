@@ -1,0 +1,25 @@
+{
+  "name": "Mercado Fácil",
+  "short_name": "Mercado Fácil",
+  "description": "Gerenciador de listas de compras",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2d8659",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "Logo192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "Logo512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
