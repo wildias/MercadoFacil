@@ -6,6 +6,5 @@
         public string Descricao { get; set; }
         public string Imagem { get; set; }
         public string Secao { get; set; }
-        public string Tipo { get; set; }
     }
 }
