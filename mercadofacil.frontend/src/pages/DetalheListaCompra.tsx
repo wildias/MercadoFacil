@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/DetalheListaCompra.css';
-import logo from '../assets/images/Logo.png';
 import icone from '../assets/images/Icone.png';
 
 interface Produto {
@@ -8,8 +7,6 @@ interface Produto {
   descricao: string;
   imagem: string;
   secao: string;
-  tipo: string;
-  quantidade: number;
   comprado?: boolean;
 }
 
@@ -90,7 +87,6 @@ const DetalheListaCompra: React.FC<DetalheListaCompraProps> = ({ listaCompraId, 
       <div className="detalhe-lista-container">
         <header className="detalhe-lista-header">
           <img src={icone} alt="Ícone" className="detalhe-lista-icone" />
-          <img src={logo} alt="Mercado Fácil" className="detalhe-lista-logo" />
           <h2>Lista de Compra: {listaCompraId}</h2>
           <button className="btn-fechar-detalhe" onClick={onClose}>✖</button>
         </header>
@@ -118,7 +114,7 @@ const DetalheListaCompra: React.FC<DetalheListaCompraProps> = ({ listaCompraId, 
                             className="produto-checkbox"
                           />
                           <span className={produto.comprado ? 'produto-texto-riscado' : ''}>
-                            {produto.descricao} - {produto.quantidade} {produto.tipo}
+                            {produto.descricao}
                           </span>
                         </label>
                       </div>

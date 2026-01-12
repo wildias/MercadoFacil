@@ -25,6 +25,9 @@ Console.WriteLine($"MYSQLUSER={user}");
 var connectionString =
     $"Server={host};Port={portDb};Database={database};User={user};Password={password};SslMode=Required;";
 
+//var connectionString =
+//    $"Server=localhost;Database=mercadofacil;User=root;Password=ab12c3;";
+
 builder.Services.AddDbContext<MercadoFacilContext>(options =>
     options.UseMySql(
         connectionString,

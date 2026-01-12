@@ -310,6 +310,102 @@
   font-size: 16px;
 }
 
+.produtos-por-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.secao-grupo-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.secao-header-modal {
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.secao-icon {
+  font-size: 20px;
+}
+
+.secao-nome {
+  font-size: 16px;
+}
+
+.produtos-lista-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.produto-linha-modal {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.produto-linha-modal:hover {
+  background-color: #f9f9f9;
+}
+
+.produto-linha-modal:last-child {
+  border-bottom: none;
+}
+
+.produto-linha-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.produto-linha-nome {
+  flex: 1;
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  margin-left: 0;
+}
+
+.btn-adicionar-linha {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border: none;
+  border-radius: 50%;
+  background-color: #2d8659;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn-adicionar-linha:hover {
+  background-color: #246b47;
+  transform: scale(1.1);
+}
+
 .produtos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

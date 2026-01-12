@@ -4,6 +4,7 @@ using MercadoFacil.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MercadoFacil.Api.Migrations
 {
     [DbContext(typeof(MercadoFacilContext))]
-    partial class MercadoFacilContextModelSnapshot : ModelSnapshot
+    [Migration("20260112144119_removendoColuna")]
+    partial class removendoColuna
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

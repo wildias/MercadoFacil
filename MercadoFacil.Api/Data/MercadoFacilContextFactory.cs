@@ -11,6 +11,8 @@ namespace MercadoFacil.Api.Data
 
             var connectionString =
                 "Server=mysql.railway.internal;Port=3306;Database=railway;User=root;Password=XTfmFwKkbXWMlXVBnsowqNKvlyREnFai";
+            //var connectionString =
+            //    "Server=localhost;Database=mercadofacil;User=root;Password=ab12c3;";
 
             optionsBuilder.UseMySql(
                 connectionString,

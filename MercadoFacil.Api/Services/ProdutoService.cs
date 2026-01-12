@@ -29,7 +29,6 @@ namespace MercadoFacil.Api.Services
                     var novoProduto = new Produto
                     {
                         Descricao = item.Descricao,
-                        Tipo = Enum.Parse<UnidadeEnum>(item.Tipo),
                         Secao = Enum.Parse<SecaoEnum>(item.Secao),
                         Imagem = item.Imagem != null ? ImagemUtil.ComprimirImagemBase64ParaBytes(item.Imagem) : null
                     };
@@ -57,7 +56,6 @@ namespace MercadoFacil.Api.Services
                         ProdutoId = p.ProdutoId,
                         Descricao = p.Descricao,
                         Imagem = p.Imagem == null ? null : ImagemUtil.DescomprimirImagemParaBase64(p.Imagem),
-                        Tipo = p.Tipo.ToString(),
                         Secao = p.Secao.ToString(),
                     })
                     .ToList();

@@ -5,14 +5,12 @@ export interface Produto {
   descricao: string;
   imagem: string;
   secao: string;
-  tipo: string;
 }
 
 export interface ProdutoCadastro {
   Descricao: string;
   Imagem: string;
   Secao: string;
-  Tipo: string;
 }
 
 export interface CadastroResponse {

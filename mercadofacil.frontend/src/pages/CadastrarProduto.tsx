@@ -15,7 +15,6 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
   const [imagem, setImagem] = useState('');
   const [imagemPreview, setImagemPreview] = useState('');
   const [secao, setSecao] = useState('');
-  const [tipo, setTipo] = useState('UN');
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,7 +64,6 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
       Descricao: descricao,
       Imagem: imagem,
       Secao: secao,
-      Tipo: tipo,
     };
 
     setProdutos([...produtos, novoProduto]);
@@ -75,7 +73,6 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
     setImagem('');
     setImagemPreview('');
     setSecao('');
-    setTipo('UN');
   };
 
   const handleSolicitarRemocao = (index: number) => {
@@ -160,14 +157,6 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="tipo">Tipo</label>
-                <select id="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-                  <option value="UN">UN</option>
-                  <option value="KG">KG</option>
-                </select>
-              </div>
-
-              <div className="form-group">
                 <label htmlFor="secao">Seção</label>
                 <select id="secao" value={secao} onChange={(e) => setSecao(e.target.value)}>
                   <option value="">Selecione...</option>
@@ -187,7 +176,7 @@ const CadastrarProduto: React.FC<CadastrarProdutoProps> = ({ onClose }) => {
                   {produtos.map((prod, index) => (
                     <div key={index} className="produto-item">
                       <span className="produto-texto">
-                        {prod.Descricao} - {prod.Tipo} - {secoes.find(s => s.value === prod.Secao)?.label}
+                        {prod.Descricao} - {secoes.find(s => s.value === prod.Secao)?.label}
                       </span>
                       <button
                         className="btn-remover-produto"
