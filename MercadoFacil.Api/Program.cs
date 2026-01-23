@@ -8,35 +8,35 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-builder.WebHost.UseUrls($"http://*:{port}");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-var host = Environment.GetEnvironmentVariable("MYSQLHOST");
-var portDb = Environment.GetEnvironmentVariable("MYSQLPORT");
-var database = Environment.GetEnvironmentVariable("MYSQLDATABASE");
-var user = Environment.GetEnvironmentVariable("MYSQLUSER");
-var password = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
 
-Console.WriteLine($"MYSQLHOST={host}");
-Console.WriteLine($"MYSQLPORT={portDb}");
-Console.WriteLine($"MYSQLDATABASE={database}");
-Console.WriteLine($"MYSQLUSER={user}");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-var connectionString =
-    $"Server={host};Port={portDb};Database={database};User={user};Password={password};SslMode=Required;";
-
-//var connectionString =
-//    $"Server=localhost;Database=mercadofacil;User=root;Password=ab12c3;";
+if (string.IsNullOrEmpty(databaseUrl))
+{
+    throw new Exception("DATABASE_URL não encontrada!");
+}
 
 builder.Services.AddDbContext<MercadoFacilContext>(options =>
-    options.UseMySql(
-        connectionString,
-        new MySqlServerVersion(new Version(8, 0, 36))
-    ));
+{
+    options.UseNpgsql(databaseUrl);
+});
+
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition =
+            System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -67,69 +67,43 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
 const string CorsPolicy = "AllowFrontend";
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(CorsPolicy, policy =>
-        policy
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .SetIsOriginAllowed(_ => true)
-    );
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .SetIsOriginAllowed(_ => true));
 });
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler =
-        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.DefaultIgnoreCondition =
-        System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-});
 
 var app = builder.Build();
 
-var retry = 0;
-while (retry < 5)
+using (var scope = app.Services.CreateScope())
 {
-    try
-    {
-        using var scope = app.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<MercadoFacilContext>();
-        db.Database.Migrate();
-        Console.WriteLine("Migration aplicada com sucesso!");
-        break;
-    }
-    catch (Exception ex)
-    {
-        retry++;
-        Console.WriteLine($"Tentativa {retry} falhou:");
-        Console.WriteLine(ex.Message);
-        Thread.Sleep(5000);
-    }
+    var db = scope.ServiceProvider.GetRequiredService<MercadoFacilContext>();
+    db.Database.Migrate();
 }
-
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto
 });
 
 app.UseSwagger();
-
-app.UseSwaggerUI(options =>
+app.UseSwaggerUI(c =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "MercadoFacil API v1");
-    options.RoutePrefix = "swagger";
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MercadoFacil API v1");
+    c.RoutePrefix = "swagger";
 });
 
 app.UseCors(CorsPolicy);
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
-
 app.MapControllers();
 
 app.Run();
