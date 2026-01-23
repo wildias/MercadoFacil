@@ -32,6 +32,10 @@ namespace MercadoFacil.Api.Controllers
         public async Task<ActionResult<IEnumerable<ProdutoResponse>>> GetProdutos()
         {
             var produtos = await _produtoService.BuscarProdutos();
+
+            if (produtos == null || !produtos.Any())
+                return Ok(new List<ProdutoResponse>());
+
             return Ok(produtos);
         }
     }

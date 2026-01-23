@@ -4,6 +4,7 @@ using MercadoFacil.Api.Model.Enum;
 using MercadoFacil.Api.Model.Response;
 using MercadoFacil.Api.Model.ViewModel;
 using MercadoFacil.Api.Util;
+using Microsoft.EntityFrameworkCore;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace MercadoFacil.Api.Services
@@ -50,7 +51,8 @@ namespace MercadoFacil.Api.Services
         {
             try
             {
-                var prods = _context.Produto
+                var prods = await _context.Produto
+                    .AsNoTracking()
                     .Select(p => new ProdutoResponse
                     {
                         ProdutoId = p.ProdutoId,
@@ -58,14 +60,18 @@ namespace MercadoFacil.Api.Services
                         Imagem = p.Imagem == null ? null : ImagemUtil.DescomprimirImagemParaBase64(p.Imagem),
                         Secao = p.Secao.ToString(),
                     })
-                    .ToList();
+                    .ToListAsync();
 
                 return prods;
             }
             catch (Exception ex)
             {
+                // LOGA o erro (importantíssimo)
+                Console.WriteLine("ERRO AO BUSCAR PRODUTOS:");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
 
-                return null;
+                return new List<ProdutoResponse>();
             }
         }
     }
