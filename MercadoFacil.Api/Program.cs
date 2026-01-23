@@ -8,24 +8,21 @@ using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-
-
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-if (string.IsNullOrEmpty(databaseUrl))
+if (string.IsNullOrWhiteSpace(databaseUrl))
 {
     throw new Exception("DATABASE_URL não encontrada.");
 }
 
-// Converte postgres:// para connection string válida
 var uri = new Uri(databaseUrl);
 var userInfo = uri.UserInfo.Split(':');
 
+var port = uri.Port > 0 ? uri.Port : 5432;
+
 var connectionString =
     $"Host={uri.Host};" +
-    $"Port={uri.Port};" +
+    $"Port={port};" +
     $"Database={uri.AbsolutePath.TrimStart('/')};" +
     $"Username={userInfo[0]};" +
     $"Password={userInfo[1]};" +
@@ -35,7 +32,6 @@ builder.Services.AddDbContext<MercadoFacilContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
-
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
