@@ -10,14 +10,12 @@ namespace MercadoFacil.Api.Data
             var optionsBuilder = new DbContextOptionsBuilder<MercadoFacilContext>();
 
             var connectionString =
-                "Server=mysql.railway.internal;Port=3306;Database=railway;User=root;Password=XTfmFwKkbXWMlXVBnsowqNKvlyREnFai";
+                Environment.GetEnvironmentVariable("DATABASE_URL")
+                ?? "Host=localhost;Port=5432;Database=mercadofacil;Username=postgres;Password=postgres";
             //var connectionString =
             //    "Server=localhost;Database=mercadofacil;User=root;Password=ab12c3;";
 
-            optionsBuilder.UseMySql(
-                connectionString,
-                ServerVersion.AutoDetect(connectionString)
-            );
+            optionsBuilder.UseNpgsql(connectionString);
 
             return new MercadoFacilContext(optionsBuilder.Options);
         }
